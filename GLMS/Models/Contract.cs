@@ -29,3 +29,4 @@ namespace GLMS.Models
 
         public ICollection<ServiceRequest>? ServiceRequests { get; set; }
     }
+}
