@@ -17,15 +17,21 @@ namespace GLMS.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IFileService _fileService;
         private readonly IContractFactory _contractFactory;
+        private readonly ISubject _subject;
+        private readonly IObserver _observer;
 
         public ContractsController(
-            ApplicationDbContext context,
-            IFileService fileService,
-            IContractFactory contractFactory)
+    ApplicationDbContext context,
+    IFileService fileService,
+    IContractFactory contractFactory,
+    ISubject subject,
+    IObserver observer)
         {
             _context = context;
             _fileService = fileService;
             _contractFactory = contractFactory;
+            _subject = subject;
+            _observer = observer;
         }
 
         // GET: Contracts
@@ -112,6 +118,10 @@ namespace GLMS.Controllers
 
             _context.Add(contract);
             await _context.SaveChangesAsync();
+
+            _subject.Attach(_observer);
+            _subject.Notify($"Contract '{contract.Description}' was created with status '{contract.Status}'.");
+
             return RedirectToAction(nameof(Index));
         }
 
