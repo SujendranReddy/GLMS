@@ -27,6 +27,8 @@ namespace GLMS.Models
 
         public string? SignedAgreementFilePath { get; set; }
 
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+
         public ICollection<ServiceRequest>? ServiceRequests { get; set; }
     }
 }
