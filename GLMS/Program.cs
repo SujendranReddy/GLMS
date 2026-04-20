@@ -15,6 +15,8 @@ builder.Services.AddHttpClient<ICurrencyService, CurrencyService>();
 
 builder.Services.AddScoped<IFileService, FileService>();
 
+builder.Services.AddScoped<IServiceRequestService, ServiceRequestService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -16,11 +16,16 @@ namespace GLMS.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ICurrencyService _currencyService;
+        private readonly IServiceRequestService _serviceRequestService;
 
-        public ServiceRequestsController(ApplicationDbContext context, ICurrencyService currencyService)
+        public ServiceRequestsController(
+            ApplicationDbContext context,
+            ICurrencyService currencyService,
+            IServiceRequestService serviceRequestService)
         {
             _context = context;
             _currencyService = currencyService;
+            _serviceRequestService = serviceRequestService;
         }
         // GET: ServiceRequests
         public async Task<IActionResult> Index()
@@ -61,7 +66,7 @@ namespace GLMS.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-    [Bind("ServiceRequestId,ContractId,Description,CostUSD,CreatedDate")]
+     [Bind("ServiceRequestId,ContractId,Description,CostUSD,CreatedDate")]
     ServiceRequest serviceRequest)
         {
             var contract = await _context.Contracts
@@ -71,8 +76,7 @@ namespace GLMS.Controllers
             {
                 ModelState.AddModelError("", "Contract not found.");
             }
-            else if (contract.Status == ContractStatus.Expired ||
-                     contract.Status == ContractStatus.OnHold)
+            else if (!_serviceRequestService.CanCreateRequest(contract))
             {
                 ModelState.AddModelError("", "Cannot create a service request for an inactive contract.");
             }
