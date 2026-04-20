@@ -57,15 +57,37 @@ namespace GLMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ServiceRequestId,ContractId,Description,CostUSD,CostZAR,CreatedDate")] ServiceRequest serviceRequest)
+        public async Task<IActionResult> Create(
+    [Bind("ServiceRequestId,ContractId,Description,CostUSD,CostZAR,CreatedDate")]
+    ServiceRequest serviceRequest)
         {
+            var contract = await _context.Contracts
+                .FirstOrDefaultAsync(c => c.ContractId == serviceRequest.ContractId);
+
+            if (contract == null)
+            {
+                ModelState.AddModelError("", "Contract not found.");
+            }
+            else if (contract.Status == Enums.ContractStatus.Expired ||
+                     contract.Status == Enums.ContractStatus.OnHold)
+            {
+                ModelState.AddModelError("",
+                    "Cannot create a service request for an inactive contract.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(serviceRequest);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ContractId"] = new SelectList(_context.Contracts, "ContractId", "Description", serviceRequest.ContractId);
+
+            ViewData["ContractId"] = new SelectList(
+                _context.Contracts,
+                "ContractId",
+                "Description",
+                serviceRequest.ContractId);
+
             return View(serviceRequest);
         }
 
