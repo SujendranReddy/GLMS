@@ -13,6 +13,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddHttpClient<ICurrencyService, CurrencyService>();
 
+builder.Services.AddScoped<IFileService, FileService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
