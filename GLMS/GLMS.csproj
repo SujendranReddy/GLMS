@@ -8,8 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Services\" />
-    <Folder Include="Data\" />
-    <Folder Include="Enums\" />
     <Folder Include="Interfaces\" />
     <Folder Include="wwwroot\Uploads\" />
   </ItemGroup>
