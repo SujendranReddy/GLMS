@@ -1,5 +1,6 @@
 ﻿using GLMS.Data;
 using GLMS.Enums;
+using GLMS.Interfaces;
 using GLMS.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -14,10 +15,12 @@ namespace GLMS.Controllers
     public class ContractsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFileService _fileService;
 
-        public ContractsController(ApplicationDbContext context)
+        public ContractsController(ApplicationDbContext context, IFileService fileService)
         {
             _context = context;
+            _fileService = fileService;
         }
 
         // GET: Contracts
@@ -90,32 +93,15 @@ namespace GLMS.Controllers
 
             if (pdfFile != null)
             {
-                var extension = Path.GetExtension(pdfFile.FileName);
-
-                if (extension.ToLower() != ".pdf")
+                if (!_fileService.IsPdf(pdfFile))
                 {
                     ModelState.AddModelError("", "Only PDF files are allowed.");
                     ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Name", contract.ClientId);
                     return View(contract);
                 }
 
-                var fileName = Guid.NewGuid() + ".pdf";
-
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
-
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
-
-                var filePath = Path.Combine(uploadsFolder, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await pdfFile.CopyToAsync(stream);
-                }
-
-                contract.SignedAgreementFilePath = fileName;
+                var savedFileName = await _fileService.SavePdfAsync(pdfFile);
+                contract.SignedAgreementFilePath = savedFileName;
             }
 
             _context.Add(contract);
