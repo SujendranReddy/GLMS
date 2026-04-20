@@ -113,7 +113,7 @@ namespace GLMS.Controllers
             {
                 return NotFound();
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Name"); 
+            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Name", contract.ClientId);
             return View(contract);
         }
 
@@ -149,7 +149,7 @@ namespace GLMS.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Name");
+            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Name", contract.ClientId);
             return View(contract);
         }
 

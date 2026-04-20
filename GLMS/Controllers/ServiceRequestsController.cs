@@ -1,24 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using GLMS.Data;
+using GLMS.Enums;
+using GLMS.Interfaces;
+using GLMS.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using GLMS.Data;
-using GLMS.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace GLMS.Controllers
 {
     public class ServiceRequestsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICurrencyService _currencyService;
 
-        public ServiceRequestsController(ApplicationDbContext context)
+        public ServiceRequestsController(ApplicationDbContext context, ICurrencyService currencyService)
         {
             _context = context;
+            _currencyService = currencyService;
         }
-
         // GET: ServiceRequests
         public async Task<IActionResult> Index()
         {
@@ -58,7 +61,7 @@ namespace GLMS.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-    [Bind("ServiceRequestId,ContractId,Description,CostUSD,CostZAR,CreatedDate")]
+    [Bind("ServiceRequestId,ContractId,Description,CostUSD,CreatedDate")]
     ServiceRequest serviceRequest)
         {
             var contract = await _context.Contracts
@@ -68,11 +71,20 @@ namespace GLMS.Controllers
             {
                 ModelState.AddModelError("", "Contract not found.");
             }
-            else if (contract.Status == Enums.ContractStatus.Expired ||
-                     contract.Status == Enums.ContractStatus.OnHold)
+            else if (contract.Status == ContractStatus.Expired ||
+                     contract.Status == ContractStatus.OnHold)
             {
-                ModelState.AddModelError("",
-                    "Cannot create a service request for an inactive contract.");
+                ModelState.AddModelError("", "Cannot create a service request for an inactive contract.");
+            }
+
+            try
+            {
+                serviceRequest.CostZAR = await _currencyService.ConvertUsdToZarAsync(serviceRequest.CostUSD);
+                ModelState.Remove("CostZAR");
+            }
+            catch
+            {
+                ModelState.AddModelError("", "Unable to retrieve the exchange rate right now. Please try again.");
             }
 
             if (ModelState.IsValid)
