@@ -43,6 +43,15 @@
     </dl>
 </div>
 <div>
+    @if (Model.SignedAgreementFilePath != null)
+    {
+        <p>
+            <a asp-action="Download"
+               asp-route-fileName="@Model.SignedAgreementFilePath">
+                Download Signed Agreement
+            </a>
+        </p>
+    }
     <a asp-action="Edit" asp-route-id="@Model?.ContractId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

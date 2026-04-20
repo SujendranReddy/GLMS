@@ -48,7 +48,7 @@ namespace GLMS.Controllers
         // GET: Contracts/Create
         public IActionResult Create()
         {
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Email");
+            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Name"); 
             return View();
         }
 
@@ -57,16 +57,47 @@ namespace GLMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ContractId,ClientId,Description,Cost,Status,SignedAgreementFilePath")] Contract contract)
+        public async Task<IActionResult> Create(Contract contract, IFormFile pdfFile)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(contract);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Name", contract.ClientId);
+                return View(contract);
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Email", contract.ClientId);
-            return View(contract);
+
+            if (pdfFile != null)
+            {
+                var extension = Path.GetExtension(pdfFile.FileName);
+
+                if (extension.ToLower() != ".pdf")
+                {
+                    ModelState.AddModelError("", "Only PDF files are allowed.");
+                    ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Name", contract.ClientId);
+                    return View(contract);
+                }
+
+                var fileName = Guid.NewGuid() + ".pdf";
+
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await pdfFile.CopyToAsync(stream);
+                }
+
+                contract.SignedAgreementFilePath = fileName;
+            }
+
+            _context.Add(contract);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Contracts/Edit/5
@@ -82,7 +113,7 @@ namespace GLMS.Controllers
             {
                 return NotFound();
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Email", contract.ClientId);
+            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Name"); 
             return View(contract);
         }
 
@@ -118,7 +149,7 @@ namespace GLMS.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Email", contract.ClientId);
+            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Name");
             return View(contract);
         }
 
@@ -159,6 +190,24 @@ namespace GLMS.Controllers
         private bool ContractExists(int id)
         {
             return _context.Contracts.Any(e => e.ContractId == id);
+        }
+
+        public IActionResult Download(string fileName)
+        {
+            if (fileName == null)
+                return NotFound();
+
+            var path = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot/uploads",
+                fileName);
+
+            if (!System.IO.File.Exists(path))
+                return NotFound();
+
+            var bytes = System.IO.File.ReadAllBytes(path);
+
+            return File(bytes, "application/pdf", fileName);
         }
     }
 }
