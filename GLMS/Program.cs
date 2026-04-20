@@ -17,6 +17,8 @@ builder.Services.AddScoped<IFileService, FileService>();
 
 builder.Services.AddScoped<IServiceRequestService, ServiceRequestService>();
 
+builder.Services.AddScoped<IContractFactory, ContractFactory>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

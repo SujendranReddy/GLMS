@@ -16,11 +16,16 @@ namespace GLMS.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IFileService _fileService;
+        private readonly IContractFactory _contractFactory;
 
-        public ContractsController(ApplicationDbContext context, IFileService fileService)
+        public ContractsController(
+            ApplicationDbContext context,
+            IFileService fileService,
+            IContractFactory contractFactory)
         {
             _context = context;
             _fileService = fileService;
+            _contractFactory = contractFactory;
         }
 
         // GET: Contracts
@@ -74,8 +79,9 @@ namespace GLMS.Controllers
         // GET: Contracts/Create
         public IActionResult Create()
         {
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Name"); 
-            return View();
+            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Name");
+            var contract = _contractFactory.Create();
+            return View(contract);
         }
 
         // POST: Contracts/Create
