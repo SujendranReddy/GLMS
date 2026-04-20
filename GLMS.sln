@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36414.22 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GLMS", "GLMS\GLMS.csproj", "{9F62C2AC-F714-402E-B006-5405E5D4A0D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GLMS.Tests", "GLMS.Tests\GLMS.Tests.csproj", "{A015B3D1-8055-438E-96BD-D7EE9B18A603}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9F62C2AC-F714-402E-B006-5405E5D4A0D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F62C2AC-F714-402E-B006-5405E5D4A0D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F62C2AC-F714-402E-B006-5405E5D4A0D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F62C2AC-F714-402E-B006-5405E5D4A0D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A015B3D1-8055-438E-96BD-D7EE9B18A603}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A015B3D1-8055-438E-96BD-D7EE9B18A603}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A015B3D1-8055-438E-96BD-D7EE9B18A603}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A015B3D1-8055-438E-96BD-D7EE9B18A603}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AB941CBD-0F00-4ADE-BC79-A89765F86900}
+	EndGlobalSection
+EndGlobal
