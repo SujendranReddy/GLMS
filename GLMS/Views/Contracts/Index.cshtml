@@ -4,56 +4,66 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Contracts</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<form asp-action="Index" method="get" class="mb-3">
+    <div class="row">
+        <div class="col-md-3">
+            <label>Status</label>
+            <select name="status" class="form-control" asp-items="Html.GetEnumSelectList<GLMS.Enums.ContractStatus>()">
+                <option value="">All</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label>Start Date</label>
+            <input type="date" name="startDate" class="form-control" value="@ViewBag.StartDate" />
+        </div>
+
+        <div class="col-md-3">
+            <label>End Date</label>
+            <input type="date" name="endDate" class="form-control" value="@ViewBag.EndDate" />
+        </div>
+
+        <div class="col-md-3 mt-4">
+            <input type="submit" value="Filter" class="btn btn-primary" />
+            <a asp-action="Index" class="btn btn-secondary">Clear</a>
+        </div>
+    </div>
+</form>
+
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Client)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cost)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SignedAgreementFilePath)
-            </th>
+            <th>Client</th>
+            <th>@Html.DisplayNameFor(model => model.Description)</th>
+            <th>@Html.DisplayNameFor(model => model.Cost)</th>
+            <th>@Html.DisplayNameFor(model => model.Status)</th>
+            <th>Created Date</th>
+            <th>@Html.DisplayNameFor(model => model.SignedAgreementFilePath)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Client.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Cost)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SignedAgreementFilePath)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ContractId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ContractId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ContractId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Client?.Name</td>
+                <td>@item.Description</td>
+                <td>@item.Cost</td>
+                <td>@item.Status</td>
+                <td>@item.CreatedDate.ToShortDateString()</td>
+                <td>@item.SignedAgreementFilePath</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ContractId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.ContractId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ContractId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

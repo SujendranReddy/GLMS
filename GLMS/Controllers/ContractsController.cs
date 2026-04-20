@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using GLMS.Data;
+using GLMS.Enums;
+using GLMS.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using GLMS.Data;
-using GLMS.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace GLMS.Controllers
 {
@@ -20,10 +21,32 @@ namespace GLMS.Controllers
         }
 
         // GET: Contracts
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(ContractStatus? status, DateTime? startDate, DateTime? endDate)
         {
-            var applicationDbContext = _context.Contracts.Include(c => c.Client);
-            return View(await applicationDbContext.ToListAsync());
+            var contracts = _context.Contracts
+                .Include(c => c.Client)
+                .AsQueryable();
+
+            if (status.HasValue)
+            {
+                contracts = contracts.Where(c => c.Status == status.Value);
+            }
+
+            if (startDate.HasValue)
+            {
+                contracts = contracts.Where(c => c.CreatedDate >= startDate.Value);
+            }
+
+            if (endDate.HasValue)
+            {
+                contracts = contracts.Where(c => c.CreatedDate <= endDate.Value);
+            }
+
+            ViewBag.SelectedStatus = status;
+            ViewBag.StartDate = startDate?.ToString("yyyy-MM-dd");
+            ViewBag.EndDate = endDate?.ToString("yyyy-MM-dd");
+
+            return View(await contracts.ToListAsync());
         }
 
         // GET: Contracts/Details/5
@@ -122,7 +145,7 @@ namespace GLMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ContractId,ClientId,Description,Cost,Status,SignedAgreementFilePath")] Contract contract)
+        public async Task<IActionResult> Edit(int id, [Bind("ContractId,ClientId,Description,Cost,Status,SignedAgreementFilePath,CreatedDate")] Contract contract)
         {
             if (id != contract.ContractId)
             {
