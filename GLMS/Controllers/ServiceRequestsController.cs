@@ -56,7 +56,21 @@ namespace GLMS.Controllers
         // GET: ServiceRequests/Create
         public IActionResult Create()
         {
-            ViewData["ContractId"] = new SelectList(_context.Contracts, "ContractId", "Description");
+            // Since clients can have similar names and contract names, i combined the client name and contract id
+            var contracts = _context.Contracts
+                .Select(c => new
+                {
+                    c.ContractId,
+                    DisplayText = c.Client.Name + " — Contract " + c.ContractId
+                })
+                .ToList();
+
+            ViewData["ContractId"] = new SelectList(
+                contracts,
+                "ContractId",
+                "DisplayText"
+            );
+
             return View();
         }
 
@@ -66,9 +80,10 @@ namespace GLMS.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-     [Bind("ServiceRequestId,ContractId,Description,CostUSD,CreatedDate")]
+    [Bind("ServiceRequestId,ContractId,Description,CostUSD,CreatedDate")]
     ServiceRequest serviceRequest)
         {
+            //Checks that the contract actually existed before creating a service
             var contract = await _context.Contracts
                 .FirstOrDefaultAsync(c => c.ContractId == serviceRequest.ContractId);
 
@@ -78,11 +93,13 @@ namespace GLMS.Controllers
             }
             else if (!_serviceRequestService.CanCreateRequest(contract))
             {
+                //Prevents them from being created if they are not active
                 ModelState.AddModelError("", "Cannot create a service request for an inactive contract.");
             }
 
             try
             {
+                //Converts the amount from USD to ZAR
                 serviceRequest.CostZAR = await _currencyService.ConvertUsdToZarAsync(serviceRequest.CostUSD);
                 ModelState.Remove("CostZAR");
             }
@@ -98,11 +115,20 @@ namespace GLMS.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            var contracts = _context.Contracts
+                .Select(c => new
+                {
+                    c.ContractId,
+                    DisplayText = c.Client.Name + " - Contract " + c.ContractId
+                })
+                .ToList();
+
             ViewData["ContractId"] = new SelectList(
-                _context.Contracts,
+                contracts,
                 "ContractId",
-                "Description",
-                serviceRequest.ContractId);
+                "DisplayText",
+                serviceRequest.ContractId
+            );
 
             return View(serviceRequest);
         }

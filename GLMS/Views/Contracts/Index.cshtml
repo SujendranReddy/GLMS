@@ -1,69 +1,156 @@
 ﻿@model IEnumerable<GLMS.Models.Contract>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Contracts";
 }
 
-<h1>Contracts</h1>
+<h1 class="mb-3">Contracts</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn home-btn-primary">Create New</a>
 </p>
 
-<form asp-action="Index" method="get" class="mb-3">
-    <div class="row">
+<form asp-action="Index" method="get" class="mb-4">
+
+    <div class="row g-2">
+
         <div class="col-md-3">
-            <label>Status</label>
-            <select name="status" class="form-control" asp-items="Html.GetEnumSelectList<GLMS.Enums.ContractStatus>()">
+
+            <label class="fw-semibold">Status</label>
+
+            <select name="status"
+                    class="form-control border-success"
+                    asp-items="Html.GetEnumSelectList<GLMS.Enums.ContractStatus>()">
+
                 <option value="">All</option>
+
             </select>
+
         </div>
+
 
         <div class="col-md-3">
-            <label>Start Date</label>
-            <input type="date" name="startDate" class="form-control" value="@ViewBag.StartDate" />
+
+            <label class="fw-semibold">Start Date</label>
+
+            <input type="date"
+                   name="startDate"
+                   class="form-control border-success"
+                   value="@ViewBag.StartDate" />
+
         </div>
+
 
         <div class="col-md-3">
-            <label>End Date</label>
-            <input type="date" name="endDate" class="form-control" value="@ViewBag.EndDate" />
+
+            <label class="fw-semibold">End Date</label>
+
+            <input type="date"
+                   name="endDate"
+                   class="form-control border-success"
+                   value="@ViewBag.EndDate" />
+
         </div>
 
-        <div class="col-md-3 mt-4">
-            <input type="submit" value="Filter" class="btn btn-primary" />
-            <a asp-action="Index" class="btn btn-secondary">Clear</a>
+
+        <div class="col-md-3 d-flex align-items-end">
+
+            <input type="submit"
+                   value="Filter"
+                   class="btn home-btn-primary me-2" />
+
+            <a asp-action="Index"
+               class="btn btn-outline-secondary">
+
+                Clear
+
+            </a>
+
         </div>
+
     </div>
+
 </form>
 
-<table class="table">
-    <thead>
+
+<table class="table table-bordered table-hover align-middle">
+
+    <thead class="table-dark">
+
         <tr>
+
             <th>Client</th>
+
+            <th>@Html.DisplayNameFor(model => model.ContractId)</th>
+
             <th>@Html.DisplayNameFor(model => model.Description)</th>
+
             <th>@Html.DisplayNameFor(model => model.Cost)</th>
+
             <th>@Html.DisplayNameFor(model => model.Status)</th>
-            <th>Created Date</th>
+
+            <th>@Html.DisplayNameFor(model => model.CreatedDate)</th>
+
             <th>@Html.DisplayNameFor(model => model.SignedAgreementFilePath)</th>
+
             <th></th>
+
         </tr>
+
     </thead>
+
+
     <tbody>
+
         @foreach (var item in Model)
         {
             <tr>
+
                 <td>@item.Client?.Name</td>
+
+                <td>@item.ClientId</td>
+
                 <td>@item.Description</td>
+
                 <td>@item.Cost</td>
+
                 <td>@item.Status</td>
+
                 <td>@item.CreatedDate.ToShortDateString()</td>
+
                 <td>@item.SignedAgreementFilePath</td>
+
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.ContractId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.ContractId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.ContractId">Delete</a>
+
+                    <a asp-action="Edit"
+                       asp-route-id="@item.ContractId"
+                       class="text-success fw-semibold">
+
+                        Edit
+
+                    </a> |
+
+                    <a asp-action="Details"
+                       asp-route-id="@item.ContractId"
+                       class="text-success fw-semibold">
+
+                        Details
+
+                    </a> |
+
+                    <a asp-action="Delete"
+                       asp-route-id="@item.ContractId"
+                       class="text-danger fw-semibold">
+
+                        Delete
+
+                    </a>
+
                 </td>
+
             </tr>
         }
+
     </tbody>
+
 </table>

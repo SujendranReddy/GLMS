@@ -1,31 +1,194 @@
+html,
+body {
+    height: 100%;
+}
+
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem rgba(34, 197, 94, 0.35);
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+body.glms-body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    color: #111827;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-body {
-  margin-bottom: 60px;
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder {
+    color: var(--bs-secondary-color);
+    text-align: end;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder {
+    text-align: start;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.glms-navbar {
+    background: rgba(0, 0, 0, 0.92);
+    border-bottom: 2px solid #22c55e;
+    padding-top: 0.9rem;
+    padding-bottom: 0.9rem;
+}
+
+.glms-brand {
+    color: #22c55e !important;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.glms-nav-link {
+    color: #f8fafc !important;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+    .glms-nav-link:hover,
+    .glms-nav-link:focus {
+        color: #22c55e !important;
+    }
+
+.glms-toggler {
+    border-color: rgba(255, 255, 255, 0.25);
+    background-color: #ffffff;
+}
+
+.glms-main-content {
+    flex: 1;
+}
+
+.glms-page-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.glms-footer {
+    color: #d1d5db;
+    border-top: 1px solid rgba(34, 197, 94, 0.25);
+    background: rgba(0, 0, 0, 0.92);
+    padding: 1rem 0;
+}
+
+    .glms-footer a {
+        color: #22c55e;
+        text-decoration: none;
+    }
+
+        .glms-footer a:hover {
+            color: #86efac;
+        }
+
+.home-video-wrapper {
+    position: relative;
+    min-height: 85vh;
+    overflow: hidden;
+    border-radius: 24px;
+}
+
+.home-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.home-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.home-content {
+    position: relative;
+    z-index: 2;
+    min-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    color: #ffffff;
+}
+
+.home-title {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+}
+
+.home-subtitle {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    max-width: 700px;
+    color: #e5e7eb;
+    margin-bottom: 2rem;
+}
+
+.home-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    justify-content: center;
+}
+
+.home-btn-primary {
+    background-color: #22c55e;
+    color: #000000;
+    border: none;
+    font-weight: 600;
+    padding: 0.8rem 1.4rem;
+    border-radius: 999px;
+}
+
+    .home-btn-primary:hover {
+        background-color: #16a34a;
+        color: #ffffff;
+    }
+
+.home-btn-outline {
+    background: transparent;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    font-weight: 600;
+    padding: 0.8rem 1.4rem;
+    border-radius: 999px;
+}
+
+    .home-btn-outline:hover {
+        border-color: #22c55e;
+        color: #22c55e;
+    }
+
+@media (max-width: 768px) {
+    .home-title {
+        font-size: 2.2rem;
+    }
+
+    .home-content {
+        padding: 1.5rem;
+    }
 }

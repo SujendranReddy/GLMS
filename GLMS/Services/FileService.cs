@@ -11,6 +11,7 @@ namespace GLMS.Services
             _environment = environment;
         }
 
+        // This checks that the uploaded file is a pdf
         public bool IsPdf(IFormFile file)
         {
             if (file == null || string.IsNullOrWhiteSpace(file.FileName))

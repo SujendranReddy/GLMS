@@ -14,6 +14,9 @@ namespace GLMS.Controllers
 {
     public class ContractsController : Controller
     {
+        // The services are injected via constructor.
+        // This ensure that the business logic is separate from the controller, following the design from assignment 1. 
+        // The file handling, currency conversion, and workflow validation is used. 
         private readonly ApplicationDbContext _context;
         private readonly IFileService _fileService;
         private readonly IContractFactory _contractFactory;
@@ -40,17 +43,17 @@ namespace GLMS.Controllers
             var contracts = _context.Contracts
                 .Include(c => c.Client)
                 .AsQueryable();
-
+            // Apply the filter if user has selected a contract status
             if (status.HasValue)
             {
                 contracts = contracts.Where(c => c.Status == status.Value);
             }
-
+            // Apply the filter if user has selected a created on or after date
             if (startDate.HasValue)
             {
                 contracts = contracts.Where(c => c.CreatedDate >= startDate.Value);
             }
-
+            // Apply the filter if user has selected a created on or before date
             if (endDate.HasValue)
             {
                 contracts = contracts.Where(c => c.CreatedDate <= endDate.Value);
@@ -86,6 +89,7 @@ namespace GLMS.Controllers
         public IActionResult Create()
         {
             ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Name");
+            //Uses the factory to create contract with the default values
             var contract = _contractFactory.Create();
             return View(contract);
         }
@@ -120,7 +124,9 @@ namespace GLMS.Controllers
             await _context.SaveChangesAsync();
 
             _subject.Attach(_observer);
-            _subject.Notify($"Contract '{contract.Description}' was created with status '{contract.Status}'.");
+
+            //Notifies when a contract is created
+            _subject.Notify($"Contract '{contract.ContractId}' was created with status '{contract.Status}'.");
 
             return RedirectToAction(nameof(Index));
         }

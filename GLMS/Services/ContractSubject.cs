@@ -16,6 +16,7 @@ namespace GLMS.Services
             _observers.Remove(observer);
         }
 
+        //THis notifies all observers when an event regarding contracts happens
         public void Notify(string message)
         {
             foreach (var observer in _observers)

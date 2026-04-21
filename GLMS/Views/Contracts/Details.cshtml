@@ -1,57 +1,73 @@
 ﻿@model GLMS.Models.Contract
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Contract Details";
 }
 
-<h1>Details</h1>
+<h1 class="mb-3">Contract Details</h1>
+
+<h4 class="text-success">Contract</h4>
+
+<hr class="border-success" />
+
+
+<dl class="row">
+
+    <dt class="col-sm-3">Client</dt>
+    <dd class="col-sm-9">@Model.Client?.Name</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ContractId)</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(model => model.ContractId)</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Description)</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(model => model.Description)</dd>
+
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Cost)</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(model => model.Cost)</dd>
+
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Status)</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
+
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.CreatedDate)</dt>
+    <dd class="col-sm-9">@Model.CreatedDate.ToShortDateString()</dd>
+
+    <dt class="col-sm-3">Signed Agreement</dt>
+    <dd class="col-sm-9">
+
+        @if (Model.SignedAgreementFilePath != null)
+        {
+            <a asp-action="Download"
+               asp-route-fileName="@Model.SignedAgreementFilePath"
+               class="text-success fw-semibold">
+
+                Download PDF
+
+            </a>
+        }
+
+    </dd>
+
+</dl>
+
 
 <div>
-    <h4>Contract</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Client)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Client.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Cost)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Cost)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SignedAgreementFilePath)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SignedAgreementFilePath)
-        </dd>
-    </dl>
-</div>
-<div>
-    @if (Model.SignedAgreementFilePath != null)
-    {
-        <p>
-            <a asp-action="Download"
-               asp-route-fileName="@Model.SignedAgreementFilePath">
-                Download Signed Agreement
-            </a>
-        </p>
-    }
-    <a asp-action="Edit" asp-route-id="@Model?.ContractId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+    <a asp-action="Edit"
+       asp-route-id="@Model?.ContractId"
+       class="text-success fw-semibold">
+
+        Edit
+
+    </a> |
+
+    <a asp-action="Index"
+       class="text-success fw-semibold">
+
+        Back to List
+
+    </a>
+
 </div>
