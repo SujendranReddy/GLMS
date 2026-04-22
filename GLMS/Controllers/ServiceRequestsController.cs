@@ -146,7 +146,22 @@ namespace GLMS.Controllers
             {
                 return NotFound();
             }
-            ViewData["ContractId"] = new SelectList(_context.Contracts, "ContractId", "Description", serviceRequest.ContractId);
+
+            var contracts = _context.Contracts
+                .Select(c => new
+                {
+                    c.ContractId,
+                    DisplayText = c.Client.Name + " - Contract " + c.ContractId
+                })
+                .ToList();
+
+            ViewData["ContractId"] = new SelectList(
+                contracts,
+                "ContractId",
+                "DisplayText",
+                serviceRequest.ContractId
+            );
+
             return View(serviceRequest);
         }
 
@@ -155,35 +170,89 @@ namespace GLMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ServiceRequestId,ContractId,Description,CostUSD,CostZAR,CreatedDate")] ServiceRequest serviceRequest)
+        public async Task<IActionResult> Edit(
+    int id,
+    [Bind("ServiceRequestId,ContractId,Description,CostUSD,CreatedDate")]
+    ServiceRequest serviceRequest)
         {
             if (id != serviceRequest.ServiceRequestId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var existingRequest = await _context.ServiceRequests.FindAsync(id);
+
+            if (existingRequest == null)
             {
-                try
-                {
-                    _context.Update(serviceRequest);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ServiceRequestExists(serviceRequest.ServiceRequestId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            ViewData["ContractId"] = new SelectList(_context.Contracts, "ContractId", "Description", serviceRequest.ContractId);
-            return View(serviceRequest);
+
+            var contract = await _context.Contracts
+                .FirstOrDefaultAsync(c => c.ContractId == serviceRequest.ContractId);
+
+            if (contract == null)
+            {
+                ModelState.AddModelError("", "Contract not found.");
+            }
+            else if (!_serviceRequestService.CanCreateRequest(contract))
+            {
+                ModelState.AddModelError("", "Cannot assign this service request to an inactive contract.");
+            }
+
+            try
+            {
+                serviceRequest.CostZAR = await _currencyService.ConvertUsdToZarAsync(serviceRequest.CostUSD);
+                ModelState.Remove("CostZAR");
+            }
+            catch
+            {
+                ModelState.AddModelError("", "Unable to retrieve the exchange rate right now. Please try again.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var contracts = _context.Contracts
+                    .Select(c => new
+                    {
+                        c.ContractId,
+                        DisplayText = c.Client.Name + " - Contract " + c.ContractId
+                    })
+                    .ToList();
+
+                ViewData["ContractId"] = new SelectList(
+                    contracts,
+                    "ContractId",
+                    "DisplayText",
+                    serviceRequest.ContractId
+                );
+
+                return View(serviceRequest);
+            }
+
+            existingRequest.ContractId = serviceRequest.ContractId;
+            existingRequest.Description = serviceRequest.Description;
+            existingRequest.CostUSD = serviceRequest.CostUSD;
+            existingRequest.CostZAR = serviceRequest.CostZAR;
+            existingRequest.CreatedDate = serviceRequest.CreatedDate;
+
+            try
+            {
+                _context.Update(existingRequest);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ServiceRequestExists(serviceRequest.ServiceRequestId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: ServiceRequests/Delete/5

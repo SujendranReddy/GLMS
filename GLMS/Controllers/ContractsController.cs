@@ -153,35 +153,63 @@ namespace GLMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ContractId,ClientId,Description,Cost,Status,SignedAgreementFilePath,CreatedDate")] Contract contract)
+        public async Task<IActionResult> Edit(int id, Contract contract, IFormFile pdfFile)
         {
             if (id != contract.ContractId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var existingContract = await _context.Contracts.FindAsync(id);
+
+            if (existingContract == null)
             {
-                try
-                {
-                    _context.Update(contract);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ContractExists(contract.ContractId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Name", contract.ClientId);
-            return View(contract);
+
+            if (!ModelState.IsValid)
+            {
+                ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Name", contract.ClientId);
+                return View(contract);
+            }
+
+            existingContract.ClientId = contract.ClientId;
+            existingContract.Description = contract.Description;
+            existingContract.Cost = contract.Cost;
+            existingContract.Status = contract.Status;
+            existingContract.CreatedDate = contract.CreatedDate;
+
+            if (pdfFile != null && pdfFile.Length > 0)
+            {
+                if (!_fileService.IsPdf(pdfFile))
+                {
+                    ModelState.AddModelError("", "Only PDF files are allowed.");
+                    ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Name", contract.ClientId);
+                    return View(contract);
+                }
+
+                var savedFileName = await _fileService.SavePdfAsync(pdfFile);
+                existingContract.SignedAgreementFilePath = savedFileName;
+            }
+
+            try
+            {
+                _context.Update(existingContract);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ContractExists(contract.ContractId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Contracts/Delete/5
