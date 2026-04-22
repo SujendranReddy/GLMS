@@ -46,3 +46,5 @@ Only PDF files are accepted for contract agreements
 Service requests cannot be created for contracts that are:
 Expired
 On Hold
+
+Youtube Link: https://youtu.be/TtHoj2qN9iE?si=i545Rv5kD9yIauQJ 
