@@ -26,6 +26,7 @@ builder.Services.AddScoped<IServiceRequestRepository, ServiceRequestRepository>(
 // Register business services used by service request endpoints
 builder.Services.AddHttpClient<ICurrencyService, CurrencyService>();
 builder.Services.AddScoped<IServiceRequestService, ServiceRequestService>();
+builder.Services.AddScoped<IFileService, FileService>();
 
 var app = builder.Build();
 

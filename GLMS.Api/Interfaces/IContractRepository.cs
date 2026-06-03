@@ -18,6 +18,8 @@ namespace GLMS.Interfaces
 
         Task<bool> UpdateStatusAsync(int id, ContractStatus status);
 
+        Task<bool> UpdateAgreementFilePathAsync(int id, string fileName);
+
         Task<bool> DeleteAsync(int id);
     }
 }

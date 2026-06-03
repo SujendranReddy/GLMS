@@ -100,6 +100,22 @@ namespace GLMS.Repositories
             return true;
         }
 
+        public async Task<bool> UpdateAgreementFilePathAsync(int id, string fileName)
+        {
+            var contract = await _context.Contracts.FindAsync(id);
+
+            if (contract == null)
+            {
+                return false;
+            }
+
+            contract.SignedAgreementFilePath = fileName;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<bool> DeleteAsync(int id)
         {
             var contract = await _context.Contracts.FindAsync(id);

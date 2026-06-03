@@ -11,10 +11,14 @@ namespace GLMS.Api.Controllers
     public class ContractsController : ControllerBase
     {
         private readonly IContractRepository _contractRepository;
+        private readonly IFileService _fileService;
 
-        public ContractsController(IContractRepository contractRepository)
+        public ContractsController(
+            IContractRepository contractRepository,
+            IFileService fileService)
         {
             _contractRepository = contractRepository;
+            _fileService = fileService;
         }
 
         // GET: api/contracts
@@ -132,16 +136,112 @@ namespace GLMS.Api.Controllers
             return Ok(MapToDto(contract!));
         }
 
+        // POST: api/contracts/5/agreement
+        // Uploads a signed PDF agreement for an existing contract.
+        [HttpPost("{id:int}/agreement")]
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<ContractDto>> UploadAgreement(
+        int id,
+        IFormFile pdfFile)
+        {
+            var contract = await _contractRepository.GetByIdAsync(id);
+
+            if (contract == null)
+            {
+                return NotFound(new
+                {
+                    message = "The selected contract could not be found."
+                });
+            }
+
+            if (pdfFile == null || pdfFile.Length == 0)
+            {
+                return BadRequest(new
+                {
+                    message = "Please select a PDF agreement to upload."
+                });
+            }
+
+            if (!_fileService.IsPdf(pdfFile))
+            {
+                return BadRequest(new
+                {
+                    message = "Only PDF files are allowed."
+                });
+            }
+
+            var savedFileName = await _fileService.SavePdfAsync(pdfFile);
+
+            if (string.IsNullOrWhiteSpace(savedFileName))
+            {
+                return BadRequest(new
+                {
+                    message = "The PDF agreement could not be saved."
+                });
+            }
+
+            await _contractRepository.UpdateAgreementFilePathAsync(id, savedFileName);
+
+            var updatedContract = await _contractRepository.GetByIdAsync(id);
+
+            return Ok(MapToDto(updatedContract!));
+        }
+
+        // GET: api/contracts/5/agreement
+        // Downloads the signed PDF agreement belonging to a contract.
+        [HttpGet("{id:int}/agreement")]
+        public async Task<IActionResult> DownloadAgreement(int id)
+        {
+            var contract = await _contractRepository.GetByIdAsync(id);
+
+            if (contract == null)
+            {
+                return NotFound(new
+                {
+                    message = "The selected contract could not be found."
+                });
+            }
+
+            var filePath = _fileService.GetPdfPath(contract.SignedAgreementFilePath);
+
+            if (filePath == null)
+            {
+                return NotFound(new
+                {
+                    message = "No signed PDF agreement was found for this contract."
+                });
+            }
+
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+
+            return File(
+                fileBytes,
+                "application/pdf",
+                $"Contract-{contract.ContractId}-Agreement.pdf");
+        }
+
         // DELETE: api/contracts/5
-        // Removes a contract from the system.
+        // Removes a contract and its stored signed agreement file.
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteContract(int id)
         {
+            var contract = await _contractRepository.GetByIdAsync(id);
+
+            if (contract == null)
+            {
+                return NotFound();
+            }
+
             var deleted = await _contractRepository.DeleteAsync(id);
 
             if (!deleted)
             {
                 return NotFound();
+            }
+
+            if (!string.IsNullOrWhiteSpace(contract.SignedAgreementFilePath))
+            {
+                _fileService.DeletePdf(contract.SignedAgreementFilePath);
             }
 
             return NoContent();
