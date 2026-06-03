@@ -28,6 +28,8 @@ builder.Services.AddHttpClient<ICurrencyService, CurrencyService>();
 builder.Services.AddScoped<IServiceRequestService, ServiceRequestService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IContractFactory, ContractFactory>();
+builder.Services.AddScoped<IObserver, AuditLogger>();
+builder.Services.AddScoped<ISubject, ContractSubject>();
 
 var app = builder.Build();
 

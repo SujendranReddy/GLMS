@@ -13,15 +13,21 @@ namespace GLMS.Api.Controllers
         private readonly IContractRepository _contractRepository;
         private readonly IFileService _fileService;
         private readonly IContractFactory _contractFactory;
+        private readonly ISubject _subject;
+        private readonly IObserver _observer;
 
         public ContractsController(
             IContractRepository contractRepository,
             IFileService fileService,
-            IContractFactory contractFactory)
+            IContractFactory contractFactory,
+            ISubject subject,
+            IObserver observer)
         {
             _contractRepository = contractRepository;
             _fileService = fileService;
             _contractFactory = contractFactory;
+            _subject = subject;
+            _observer = observer;
         }
 
         // GET: api/contracts
@@ -71,6 +77,8 @@ namespace GLMS.Api.Controllers
             contract.SignedAgreementFilePath = createContractDto.SignedAgreementFilePath;
 
             var createdContract = await _contractRepository.CreateAsync(contract);
+            _subject.Attach(_observer);
+            _subject.Notify($"Contract '{createdContract.ContractId}' was created with status '{createdContract.Status}'.");
 
             var savedContract = await _contractRepository
                 .GetByIdAsync(createdContract.ContractId);
