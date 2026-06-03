@@ -96,6 +96,21 @@ namespace GLMS.Api.Controllers
             return Ok(MapToDto(contract!));
         }
 
+        // DELETE: api/contracts/5
+        // Removes a contract from the system.
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteContract(int id)
+        {
+            var deleted = await _contractRepository.DeleteAsync(id);
+
+            if (!deleted)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+        }
+
         private static ContractDto MapToDto(Contract contract)
         {
             return new ContractDto
