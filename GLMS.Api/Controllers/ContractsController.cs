@@ -77,6 +77,42 @@ namespace GLMS.Api.Controllers
                 result);
         }
 
+        // PUT: api/contracts/5
+        // Updates editable contract details while protecting the original created date.
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult<ContractDto>> UpdateContract(
+            int id,
+            [FromBody] UpdateContractDto updateContractDto)
+        {
+            var existingContract = await _contractRepository.GetByIdAsync(id);
+
+            if (existingContract == null)
+            {
+                return NotFound();
+            }
+
+            var contract = new Contract
+            {
+                ContractId = id,
+                ClientId = updateContractDto.ClientId,
+                Description = updateContractDto.Description,
+                Cost = updateContractDto.Cost,
+                Status = updateContractDto.Status,
+                SignedAgreementFilePath = updateContractDto.SignedAgreementFilePath
+            };
+
+            var updated = await _contractRepository.UpdateAsync(contract);
+
+            if (!updated)
+            {
+                return NotFound();
+            }
+
+            var savedContract = await _contractRepository.GetByIdAsync(id);
+
+            return Ok(MapToDto(savedContract!));
+        }
+
         // PATCH: api/contracts/5/status
         [HttpPatch("{id:int}/status")]
         public async Task<ActionResult<ContractDto>> UpdateContractStatus(
