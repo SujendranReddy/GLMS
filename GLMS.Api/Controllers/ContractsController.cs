@@ -12,13 +12,16 @@ namespace GLMS.Api.Controllers
     {
         private readonly IContractRepository _contractRepository;
         private readonly IFileService _fileService;
+        private readonly IContractFactory _contractFactory;
 
         public ContractsController(
             IContractRepository contractRepository,
-            IFileService fileService)
+            IFileService fileService,
+            IContractFactory contractFactory)
         {
             _contractRepository = contractRepository;
             _fileService = fileService;
+            _contractFactory = contractFactory;
         }
 
         // GET: api/contracts
@@ -59,14 +62,13 @@ namespace GLMS.Api.Controllers
         public async Task<ActionResult<ContractDto>> CreateContract(
             [FromBody] CreateContractDto createContractDto)
         {
-            var contract = new Contract
-            {
-                ClientId = createContractDto.ClientId,
-                Description = createContractDto.Description,
-                Cost = createContractDto.Cost,
-                Status = createContractDto.Status,
-                SignedAgreementFilePath = createContractDto.SignedAgreementFilePath
-            };
+            var contract = _contractFactory.Create();
+
+            contract.ClientId = createContractDto.ClientId;
+            contract.Description = createContractDto.Description;
+            contract.Cost = createContractDto.Cost;
+            contract.Status = createContractDto.Status;
+            contract.SignedAgreementFilePath = createContractDto.SignedAgreementFilePath;
 
             var createdContract = await _contractRepository.CreateAsync(contract);
 
