@@ -13,6 +13,11 @@ builder.Services.AddHttpClient<IClientApiService, ClientApiService>(client =>
     client.BaseAddress = new Uri(
         builder.Configuration["ApiSettings:BaseUrl"]!);
 });
+builder.Services.AddHttpClient<IContractApiService, ContractApiService>(client =>
+{
+    client.BaseAddress = new Uri(
+        builder.Configuration["ApiSettings:BaseUrl"]!);
+});
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
