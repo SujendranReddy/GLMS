@@ -1,6 +1,7 @@
 ﻿using GLMS.Models;
 using GLMS.Services.Api;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GLMS.Controllers
 {
