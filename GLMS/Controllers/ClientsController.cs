@@ -1,28 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using GLMS.Models;
+using GLMS.Services.Api;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using GLMS.Data;
-using GLMS.Models;
 
 namespace GLMS.Controllers
 {
     public class ClientsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IClientApiService _clientApiService;
 
-        public ClientsController(ApplicationDbContext context)
+        public ClientsController(IClientApiService clientApiService)
         {
-            _context = context;
+            _clientApiService = clientApiService;
         }
 
         // GET: Clients
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Clients.ToListAsync());
+            var clients = await _clientApiService.GetAllAsync();
+
+            return View(clients);
         }
 
         // GET: Clients/Details/5
@@ -33,8 +29,8 @@ namespace GLMS.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients
-                .FirstOrDefaultAsync(m => m.ClientId == id);
+            var client = await _clientApiService.GetByIdAsync(id.Value);
+
             if (client == null)
             {
                 return NotFound();
@@ -50,19 +46,24 @@ namespace GLMS.Controllers
         }
 
         // POST: Clients/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ClientId,Name,Email,PhoneNumber,Region")] Client client)
+        public async Task<IActionResult> Create(Client client)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(client);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return View(client);
             }
-            return View(client);
+
+            var createdClient = await _clientApiService.CreateAsync(client);
+
+            if (createdClient == null)
+            {
+                ModelState.AddModelError("", "Unable to create the client through the API. Please try again.");
+                return View(client);
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Clients/Edit/5
@@ -73,47 +74,40 @@ namespace GLMS.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients.FindAsync(id);
+            var client = await _clientApiService.GetByIdAsync(id.Value);
+
             if (client == null)
             {
                 return NotFound();
             }
+
             return View(client);
         }
 
         // POST: Clients/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ClientId,Name,Email,PhoneNumber,Region")] Client client)
+        public async Task<IActionResult> Edit(int id, Client client)
         {
             if (id != client.ClientId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(client);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ClientExists(client.ClientId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return View(client);
             }
-            return View(client);
+
+            var updated = await _clientApiService.UpdateAsync(id, client);
+
+            if (!updated)
+            {
+                ModelState.AddModelError("", "Unable to update the client through the API. Please try again.");
+                return View(client);
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Clients/Delete/5
@@ -124,8 +118,8 @@ namespace GLMS.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients
-                .FirstOrDefaultAsync(m => m.ClientId == id);
+            var client = await _clientApiService.GetByIdAsync(id.Value);
+
             if (client == null)
             {
                 return NotFound();
@@ -139,19 +133,14 @@ namespace GLMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var client = await _context.Clients.FindAsync(id);
-            if (client != null)
+            var deleted = await _clientApiService.DeleteAsync(id);
+
+            if (!deleted)
             {
-                _context.Clients.Remove(client);
+                return NotFound();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool ClientExists(int id)
-        {
-            return _context.Clients.Any(e => e.ClientId == id);
         }
     }
 }
