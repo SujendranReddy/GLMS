@@ -1,11 +1,13 @@
 ﻿using GLMS.DTOs;
 using GLMS.Interfaces;
 using GLMS.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GLMS.Api.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/service-requests")]
     public class ServiceRequestsController : ControllerBase
     {
