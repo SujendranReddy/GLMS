@@ -118,6 +118,64 @@ namespace GLMS.Tests
             Assert.NotNull(serviceRequests);
         }
 
+        [Fact]
+        public async Task CreateClient_ThenReadClient_VerifiesDataIntegrity()
+        {
+            using var client = CreateClient();
+
+            var token = await GetJwtTokenAsync(client);
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            var uniqueValue = Guid.NewGuid().ToString("N")[..8];
+
+            var newClient = new
+            {
+                name = $"Integration Test Client {uniqueValue}",
+                email = $"integration{uniqueValue}@test.com",
+                phoneNumber = "0712345678",
+                region = "South Africa"
+            };
+
+            var createResponse = await client.PostAsJsonAsync("api/clients", newClient);
+
+            Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+
+            var createdClient = await createResponse.Content.ReadFromJsonAsync<ClientResponse>();
+
+            Assert.NotNull(createdClient);
+            Assert.True(createdClient.ClientId > 0);
+            Assert.Equal(newClient.name, createdClient.Name);
+            Assert.Equal(newClient.email, createdClient.Email);
+            Assert.Equal(newClient.phoneNumber, createdClient.PhoneNumber);
+            Assert.Equal(newClient.region, createdClient.Region);
+
+            try
+            {
+                var readResponse = await client.GetAsync($"api/clients/{createdClient.ClientId}");
+
+                Assert.Equal(HttpStatusCode.OK, readResponse.StatusCode);
+
+                var readClient = await readResponse.Content.ReadFromJsonAsync<ClientResponse>();
+
+                Assert.NotNull(readClient);
+                Assert.Equal(createdClient.ClientId, readClient.ClientId);
+                Assert.Equal(newClient.name, readClient.Name);
+                Assert.Equal(newClient.email, readClient.Email);
+                Assert.Equal(newClient.phoneNumber, readClient.PhoneNumber);
+                Assert.Equal(newClient.region, readClient.Region);
+            }
+            finally
+            {
+                var deleteResponse = await client.DeleteAsync($"api/clients/{createdClient.ClientId}");
+
+                Assert.True(
+                    deleteResponse.StatusCode == HttpStatusCode.NoContent ||
+                    deleteResponse.StatusCode == HttpStatusCode.NotFound);
+            }
+        }
+
         private class LoginResponse
         {
             public string Token { get; set; } = string.Empty;
