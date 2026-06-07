@@ -1,12 +1,40 @@
 using GLMS.Data;
 using GLMS.Interfaces;
 using GLMS.Services;
+using GLMS.Services.Api;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSingleton<IApiTokenService, ApiTokenService>();
+builder.Services.AddTransient<AuthenticatedApiHandler>();
+
+builder.Services.AddHttpClient("GLMSAuthClient", client =>
+{
+    client.BaseAddress = new Uri(
+        builder.Configuration["ApiSettings:BaseUrl"]!);
+});
+
+builder.Services.AddHttpClient<IClientApiService, ClientApiService>(client =>
+{
+    client.BaseAddress = new Uri(
+        builder.Configuration["ApiSettings:BaseUrl"]!);
+}).AddHttpMessageHandler<AuthenticatedApiHandler>();
+
+builder.Services.AddHttpClient<IContractApiService, ContractApiService>(client =>
+{
+    client.BaseAddress = new Uri(
+        builder.Configuration["ApiSettings:BaseUrl"]!);
+}).AddHttpMessageHandler<AuthenticatedApiHandler>();
+
+builder.Services.AddHttpClient<IServiceRequestApiService, ServiceRequestApiService>(client =>
+{
+    client.BaseAddress = new Uri(
+        builder.Configuration["ApiSettings:BaseUrl"]!);
+}).AddHttpMessageHandler<AuthenticatedApiHandler>();
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
