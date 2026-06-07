@@ -204,7 +204,7 @@ namespace GLMS.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // Keeps old view links working if they pass fileName, but downloads safely through the API by contract ID.
+        // Keeps old view links working if they pass fileName, but downloads safely through the API by contract ID
         public async Task<IActionResult> Download(string? fileName, int? id)
         {
             int? contractId = id;

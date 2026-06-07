@@ -168,6 +168,7 @@ namespace GLMS.Tests
             }
             finally
             {
+                // Cleans up the test client even if the read assertions fail.
                 var deleteResponse = await client.DeleteAsync($"api/clients/{createdClient.ClientId}");
 
                 Assert.True(
@@ -184,33 +185,51 @@ namespace GLMS.Tests
         private class ClientResponse
         {
             public int ClientId { get; set; }
+
             public string Name { get; set; } = string.Empty;
+
             public string Email { get; set; } = string.Empty;
+
             public string PhoneNumber { get; set; } = string.Empty;
+
             public string Region { get; set; } = string.Empty;
         }
 
         private class ContractResponse
         {
             public int ContractId { get; set; }
+
             public int ClientId { get; set; }
+
             public string ClientName { get; set; } = string.Empty;
+
             public string Description { get; set; } = string.Empty;
+
             public decimal Cost { get; set; }
+
             public string Status { get; set; } = string.Empty;
+
             public string? SignedAgreementFilePath { get; set; }
+
             public DateTime CreatedDate { get; set; }
         }
 
         private class ServiceRequestResponse
         {
             public int ServiceRequestId { get; set; }
+
             public int ContractId { get; set; }
+
             public string ContractDescription { get; set; } = string.Empty;
+
             public string ClientName { get; set; } = string.Empty;
+
             public string Description { get; set; } = string.Empty;
+
             public decimal CostUSD { get; set; }
+
             public decimal CostZAR { get; set; }
+
             public DateTime CreatedDate { get; set; }
         }
     }

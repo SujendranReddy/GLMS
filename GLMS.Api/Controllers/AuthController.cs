@@ -18,7 +18,6 @@ namespace GLMS.Api.Controllers
             _configuration = configuration;
         }
 
-        // POST: api/auth/login
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequestDto loginRequest)
         {
@@ -42,6 +41,7 @@ namespace GLMS.Api.Controllers
             });
         }
 
+        // Creates the JWT used by MVC and Swagger to access protected API endpoints.
         private string GenerateJwtToken(string username)
         {
             var issuer = _configuration["JwtSettings:Issuer"];

@@ -17,6 +17,7 @@ namespace GLMS.Services.Api
         {
             var token = await _apiTokenService.GetTokenAsync();
 
+            // Adds the JWT to MVC requests sent to the protected API.
             if (!string.IsNullOrWhiteSpace(token))
             {
                 request.Headers.Authorization =

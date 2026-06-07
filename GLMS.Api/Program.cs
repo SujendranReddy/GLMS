@@ -10,10 +10,12 @@ using Microsoft.OpenApi;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
 var jwtIssuer = builder.Configuration["JwtSettings:Issuer"];
 var jwtAudience = builder.Configuration["JwtSettings:Audience"];
 var jwtKey = builder.Configuration["JwtSettings:Key"];
 
+// Protects API endpoints using JWT bearer tokens.
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -36,11 +38,11 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// Add API controller support
 builder.Services.AddControllers();
 
-// Add Swagger/OpenAPI documentation support
 builder.Services.AddEndpointsApiExplorer();
+
+// Allows Swagger to test protected endpoints with a JWT.
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
@@ -57,18 +59,15 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Register the API database context with SQL Server
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
-// Register the contract repository for dependency injection
 builder.Services.AddScoped<IContractRepository, ContractRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IServiceRequestRepository, ServiceRequestRepository>();
 
-// Register business services used by service request endpoints
 builder.Services.AddHttpClient<ICurrencyService, CurrencyService>();
 builder.Services.AddScoped<IServiceRequestService, ServiceRequestService>();
 builder.Services.AddScoped<IFileService, FileService>();
@@ -77,6 +76,8 @@ builder.Services.AddScoped<IObserver, AuditLogger>();
 builder.Services.AddScoped<ISubject, ContractSubject>();
 
 var app = builder.Build();
+
+// Creates the Docker SQL database on startup if needed.
 using (var scope = app.Services.CreateScope())
 {
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
@@ -126,7 +127,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Enable Swagger during development
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

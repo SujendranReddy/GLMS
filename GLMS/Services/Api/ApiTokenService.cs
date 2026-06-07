@@ -20,6 +20,7 @@ namespace GLMS.Services.Api
 
         public async Task<string?> GetTokenAsync()
         {
+            // Reuses the token until it is close to expiry.
             if (!string.IsNullOrWhiteSpace(_cachedToken) &&
                 DateTime.UtcNow < _tokenExpiryTime)
             {

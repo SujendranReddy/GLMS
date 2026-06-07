@@ -53,6 +53,7 @@ namespace GLMS.Services
                 return null;
             }
 
+            // Prevents path traversal by only allowing stored file names.
             var safeFileName = Path.GetFileName(fileName);
 
             if (!string.Equals(safeFileName, fileName, StringComparison.Ordinal))
@@ -89,6 +90,7 @@ namespace GLMS.Services
         {
             var webRootPath = _environment.WebRootPath;
 
+            // Docker may not always provide WebRootPath.
             if (string.IsNullOrWhiteSpace(webRootPath))
             {
                 webRootPath = Path.Combine(_environment.ContentRootPath, "wwwroot");

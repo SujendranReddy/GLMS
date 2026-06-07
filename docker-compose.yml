@@ -1,4 +1,5 @@
 services:
+  # SQL Server database container
   sql-server-db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: glms-sql-server-db
@@ -12,6 +13,7 @@ services:
     networks:
       - glms-network
 
+  # Backend Web API container
   glms-backend-api:
     build:
       context: .
@@ -33,6 +35,7 @@ services:
     networks:
       - glms-network
 
+  # MVC frontend container
   glms-frontend-web:
     build:
       context: .

@@ -28,7 +28,6 @@ namespace GLMS.Api.Controllers
             _serviceRequestService = serviceRequestService;
         }
 
-        // GET: api/service-requests
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ServiceRequestDto>>> GetServiceRequests()
         {
@@ -41,7 +40,6 @@ namespace GLMS.Api.Controllers
             return Ok(serviceRequestDtos);
         }
 
-        // GET: api/service-requests/5
         [HttpGet("{id:int}")]
         public async Task<ActionResult<ServiceRequestDto>> GetServiceRequestById(int id)
         {
@@ -55,7 +53,6 @@ namespace GLMS.Api.Controllers
             return Ok(MapToDto(serviceRequest));
         }
 
-        // POST: api/service-requests
         [HttpPost]
         public async Task<ActionResult<ServiceRequestDto>> CreateServiceRequest(
             [FromBody] CreateServiceRequestDto createServiceRequestDto)
@@ -116,7 +113,6 @@ namespace GLMS.Api.Controllers
                 result);
         }
 
-        // PUT: api/service-requests/5
         [HttpPut("{id:int}")]
         public async Task<ActionResult<ServiceRequestDto>> UpdateServiceRequest(
             int id,
@@ -184,7 +180,6 @@ namespace GLMS.Api.Controllers
             return Ok(MapToDto(savedRequest!));
         }
 
-        // DELETE: api/service-requests/5
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteServiceRequest(int id)
         {

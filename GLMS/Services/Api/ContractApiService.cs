@@ -92,7 +92,6 @@ namespace GLMS.Services.Api
         public async Task<bool> UploadAgreementAsync(int id, IFormFile pdfFile)
         {
             using var content = new MultipartFormDataContent();
-
             using var stream = pdfFile.OpenReadStream();
 
             var fileContent = new StreamContent(stream);
@@ -103,6 +102,7 @@ namespace GLMS.Services.Api
                     new System.Net.Http.Headers.MediaTypeHeaderValue(pdfFile.ContentType);
             }
 
+            // Sends the PDF using the same field name expected by the API.
             content.Add(fileContent, "pdfFile", pdfFile.FileName);
 
             var response = await _httpClient.PostAsync(
@@ -116,6 +116,7 @@ namespace GLMS.Services.Api
         {
             return await _httpClient.GetAsync($"api/contracts/{id}/agreement");
         }
+
         public async Task<bool> DeleteAsync(int id)
         {
             var response = await _httpClient.DeleteAsync($"api/contracts/{id}");
@@ -125,6 +126,7 @@ namespace GLMS.Services.Api
 
         private static Contract MapToContract(ApiContractDto apiContract)
         {
+            // API returns status as text, while MVC uses an enum.
             Enum.TryParse(
                 apiContract.Status,
                 ignoreCase: true,

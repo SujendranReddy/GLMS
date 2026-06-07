@@ -18,7 +18,6 @@ namespace GLMS.Api.Controllers
             _clientRepository = clientRepository;
         }
 
-        // GET: api/clients
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ClientDto>>> GetClients()
         {
@@ -31,7 +30,6 @@ namespace GLMS.Api.Controllers
             return Ok(clientDtos);
         }
 
-        // GET: api/clients/5
         [HttpGet("{id:int}")]
         public async Task<ActionResult<ClientDto>> GetClientById(int id)
         {
@@ -45,7 +43,6 @@ namespace GLMS.Api.Controllers
             return Ok(MapToDto(client));
         }
 
-        // POST: api/clients
         [HttpPost]
         public async Task<ActionResult<ClientDto>> CreateClient(
             [FromBody] CreateClientDto createClientDto)
@@ -67,7 +64,6 @@ namespace GLMS.Api.Controllers
                 result);
         }
 
-        // PUT: api/clients/5
         [HttpPut("{id:int}")]
         public async Task<ActionResult<ClientDto>> UpdateClient(
             int id,
@@ -94,7 +90,6 @@ namespace GLMS.Api.Controllers
             return Ok(MapToDto(savedClient!));
         }
 
-        // DELETE: api/clients/5
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteClient(int id)
         {

@@ -9,8 +9,11 @@ namespace GLMS.Services
         public bool CanCreateRequest(Contract contract)
         {
             if (contract == null)
+            {
                 return false;
+            }
 
+            // Blocks service requests for contracts that should not accept work.
             return contract.Status != ContractStatus.Expired &&
                    contract.Status != ContractStatus.OnHold;
         }

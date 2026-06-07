@@ -32,8 +32,6 @@ namespace GLMS.Api.Controllers
             _observer = observer;
         }
 
-        // GET: api/contracts
-        // Supports filtering by status and created date range.
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ContractDto>>> GetContracts(
             [FromQuery] ContractStatus? status,
@@ -50,8 +48,6 @@ namespace GLMS.Api.Controllers
             return Ok(contractDtos);
         }
 
-        // GET: api/contracts/5
-        // Needed by the MVC frontend for contract details.
         [HttpGet("{id:int}")]
         public async Task<ActionResult<ContractDto>> GetContractById(int id)
         {
@@ -65,7 +61,6 @@ namespace GLMS.Api.Controllers
             return Ok(MapToDto(contract));
         }
 
-        // POST: api/contracts
         [HttpPost]
         public async Task<ActionResult<ContractDto>> CreateContract(
             [FromBody] CreateContractDto createContractDto)
@@ -79,6 +74,8 @@ namespace GLMS.Api.Controllers
             contract.SignedAgreementFilePath = createContractDto.SignedAgreementFilePath;
 
             var createdContract = await _contractRepository.CreateAsync(contract);
+
+            // Notifies the audit logger when a contract is created.
             _subject.Attach(_observer);
             _subject.Notify($"Contract '{createdContract.ContractId}' was created with status '{createdContract.Status}'.");
 
@@ -93,8 +90,6 @@ namespace GLMS.Api.Controllers
                 result);
         }
 
-        // PUT: api/contracts/5
-        // Updates editable contract details while protecting the original created date.
         [HttpPut("{id:int}")]
         public async Task<ActionResult<ContractDto>> UpdateContract(
             int id,
@@ -129,7 +124,6 @@ namespace GLMS.Api.Controllers
             return Ok(MapToDto(savedContract!));
         }
 
-        // PATCH: api/contracts/5/status
         [HttpPatch("{id:int}/status")]
         public async Task<ActionResult<ContractDto>> UpdateContractStatus(
             int id,
@@ -148,13 +142,11 @@ namespace GLMS.Api.Controllers
             return Ok(MapToDto(contract!));
         }
 
-        // POST: api/contracts/5/agreement
-        // Uploads a signed PDF agreement for an existing contract.
         [HttpPost("{id:int}/agreement")]
         [Consumes("multipart/form-data")]
         public async Task<ActionResult<ContractDto>> UploadAgreement(
-        int id,
-        IFormFile pdfFile)
+            int id,
+            IFormFile pdfFile)
         {
             var contract = await _contractRepository.GetByIdAsync(id);
 
@@ -199,8 +191,6 @@ namespace GLMS.Api.Controllers
             return Ok(MapToDto(updatedContract!));
         }
 
-        // GET: api/contracts/5/agreement
-        // Downloads the signed PDF agreement belonging to a contract.
         [HttpGet("{id:int}/agreement")]
         public async Task<IActionResult> DownloadAgreement(int id)
         {
@@ -232,8 +222,6 @@ namespace GLMS.Api.Controllers
                 $"Contract-{contract.ContractId}-Agreement.pdf");
         }
 
-        // DELETE: api/contracts/5
-        // Removes a contract and its stored signed agreement file.
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteContract(int id)
         {
@@ -251,6 +239,7 @@ namespace GLMS.Api.Controllers
                 return NotFound();
             }
 
+            // Keeps stored PDF files in sync with deleted contracts.
             if (!string.IsNullOrWhiteSpace(contract.SignedAgreementFilePath))
             {
                 _fileService.DeletePdf(contract.SignedAgreementFilePath);
