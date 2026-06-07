@@ -11,7 +11,6 @@ namespace GLMS.Services
             _environment = environment;
         }
 
-        // Checks that the uploaded file has a PDF extension.
         public bool IsPdf(IFormFile file)
         {
             if (file == null || string.IsNullOrWhiteSpace(file.FileName))
@@ -24,7 +23,6 @@ namespace GLMS.Services
             return extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase);
         }
 
-        // Saves an uploaded PDF using a generated filename.
         public async Task<string?> SavePdfAsync(IFormFile file)
         {
             if (!IsPdf(file))
@@ -32,7 +30,7 @@ namespace GLMS.Services
                 return null;
             }
 
-            var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
+            var uploadsFolder = GetUploadsFolder();
 
             if (!Directory.Exists(uploadsFolder))
             {
@@ -48,7 +46,6 @@ namespace GLMS.Services
             return fileName;
         }
 
-        // Safely locates a stored PDF for download.
         public string? GetPdfPath(string? fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName))
@@ -68,13 +65,12 @@ namespace GLMS.Services
                 return null;
             }
 
-            var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
+            var uploadsFolder = GetUploadsFolder();
             var filePath = Path.Combine(uploadsFolder, safeFileName);
 
             return File.Exists(filePath) ? filePath : null;
         }
 
-        // Deletes a stored PDF agreement when its contract is deleted.
         public bool DeletePdf(string? fileName)
         {
             var filePath = GetPdfPath(fileName);
@@ -87,6 +83,18 @@ namespace GLMS.Services
             File.Delete(filePath);
 
             return true;
+        }
+
+        private string GetUploadsFolder()
+        {
+            var webRootPath = _environment.WebRootPath;
+
+            if (string.IsNullOrWhiteSpace(webRootPath))
+            {
+                webRootPath = Path.Combine(_environment.ContentRootPath, "wwwroot");
+            }
+
+            return Path.Combine(webRootPath, "uploads");
         }
     }
 }

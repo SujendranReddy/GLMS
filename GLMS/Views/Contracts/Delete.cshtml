@@ -10,26 +10,40 @@
 
 <hr class="border-success" />
 
-
 <dl class="row">
 
     <dt class="col-sm-3">Client</dt>
     <dd class="col-sm-9">@Model.Client?.Name</dd>
 
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ContractId)</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(model => model.ContractId)</dd>
 
     <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Description)</dt>
     <dd class="col-sm-9">@Html.DisplayFor(model => model.Description)</dd>
 
-
     <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Cost)</dt>
     <dd class="col-sm-9">@Html.DisplayFor(model => model.Cost)</dd>
-
 
     <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Status)</dt>
     <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
 
-</dl>
+    <dt class="col-sm-3">Signed Agreement</dt>
+    <dd class="col-sm-9">
+        @if (!string.IsNullOrWhiteSpace(Model.SignedAgreementFilePath))
+        {
+            <span>@Model.SignedAgreementFilePath</span>
+            <br />
+            <small class="text-muted">
+                This PDF agreement will also be deleted.
+            </small>
+        }
+        else
+        {
+            <span class="text-muted">No agreement uploaded</span>
+        }
+    </dd>
 
+</dl>
 
 <form asp-action="Delete">
 
@@ -41,9 +55,7 @@
 
     <a asp-action="Index"
        class="text-success fw-semibold ms-2">
-
         Cancel
-
     </a>
 
 </form>

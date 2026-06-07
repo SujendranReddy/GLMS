@@ -28,7 +28,6 @@
 
         </div>
 
-
         <div class="col-md-3">
 
             <label class="fw-semibold">Start Date</label>
@@ -39,7 +38,6 @@
                    value="@ViewBag.StartDate" />
 
         </div>
-
 
         <div class="col-md-3">
 
@@ -52,7 +50,6 @@
 
         </div>
 
-
         <div class="col-md-3 d-flex align-items-end">
 
             <input type="submit"
@@ -61,9 +58,7 @@
 
             <a asp-action="Index"
                class="btn btn-outline-secondary">
-
                 Clear
-
             </a>
 
         </div>
@@ -71,7 +66,6 @@
     </div>
 
 </form>
-
 
 <table class="table table-bordered table-hover align-middle">
 
@@ -91,14 +85,13 @@
 
             <th>@Html.DisplayNameFor(model => model.CreatedDate)</th>
 
-            <th>@Html.DisplayNameFor(model => model.SignedAgreementFilePath)</th>
+            <th>Agreement</th>
 
             <th></th>
 
         </tr>
 
     </thead>
-
 
     <tbody>
 
@@ -108,7 +101,7 @@
 
                 <td>@item.Client?.Name</td>
 
-                <td>@item.ClientId</td>
+                <td>@item.ContractId</td>
 
                 <td>@item.Description</td>
 
@@ -118,32 +111,39 @@
 
                 <td>@item.CreatedDate.ToShortDateString()</td>
 
-                <td>@item.SignedAgreementFilePath</td>
+                <td>
+                    @if (!string.IsNullOrWhiteSpace(item.SignedAgreementFilePath))
+                    {
+                        <a asp-action="Download"
+                           asp-route-id="@item.ContractId"
+                           class="text-success fw-semibold">
+                            Download PDF
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No agreement</span>
+                    }
+                </td>
 
                 <td>
 
                     <a asp-action="Edit"
                        asp-route-id="@item.ContractId"
                        class="text-success fw-semibold">
-
                         Edit
-
                     </a> |
 
                     <a asp-action="Details"
                        asp-route-id="@item.ContractId"
                        class="text-success fw-semibold">
-
                         Details
-
                     </a> |
 
                     <a asp-action="Delete"
                        asp-route-id="@item.ContractId"
                        class="text-danger fw-semibold">
-
                         Delete
-
                     </a>
 
                 </td>

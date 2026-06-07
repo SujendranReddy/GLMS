@@ -10,7 +10,6 @@
 
 <hr class="border-success" />
 
-
 <dl class="row">
 
     <dt class="col-sm-3">Client</dt>
@@ -22,52 +21,50 @@
     <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Description)</dt>
     <dd class="col-sm-9">@Html.DisplayFor(model => model.Description)</dd>
 
-
     <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Cost)</dt>
     <dd class="col-sm-9">@Html.DisplayFor(model => model.Cost)</dd>
 
-
     <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Status)</dt>
     <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
-
 
     <dt class="col-sm-3">@Html.DisplayNameFor(model => model.CreatedDate)</dt>
     <dd class="col-sm-9">@Model.CreatedDate.ToShortDateString()</dd>
 
     <dt class="col-sm-3">Signed Agreement</dt>
     <dd class="col-sm-9">
-
-        @if (Model.SignedAgreementFilePath != null)
+        @if (!string.IsNullOrWhiteSpace(Model.SignedAgreementFilePath))
         {
             <a asp-action="Download"
-               asp-route-fileName="@Model.SignedAgreementFilePath"
+               asp-route-id="@Model.ContractId"
                class="text-success fw-semibold">
-
                 Download PDF
-
             </a>
-        }
 
+            <br />
+
+            <small class="text-muted">
+                @Model.SignedAgreementFilePath
+            </small>
+        }
+        else
+        {
+            <span class="text-muted">No agreement uploaded</span>
+        }
     </dd>
 
 </dl>
 
-
 <div>
 
     <a asp-action="Edit"
-       asp-route-id="@Model?.ContractId"
+       asp-route-id="@Model.ContractId"
        class="text-success fw-semibold">
-
         Edit
-
     </a> |
 
     <a asp-action="Index"
        class="text-success fw-semibold">
-
         Back to List
-
     </a>
 
 </div>
