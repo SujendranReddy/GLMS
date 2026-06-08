@@ -1,6 +1,6 @@
 # Global Logistics Management System (GLMS)
 
-This is an ASP.NET Core system for managing clients, contracts, and service requests.
+This i an ASP.NET Core system for managing clients, contracts, and service requests.
 
 The system is now split into:
 
@@ -8,7 +8,7 @@ The system is now split into:
 * Web API backend
 * SQL Server database
 
-The MVC frontend uses `HttpClient` to call the Web API.
+The MVC frontend uses HttpClient to call the Web API.
 The Web API handles the database, business logic, authentication, and file handling.
 
 ## Features:
